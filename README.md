@@ -1,4 +1,4 @@
-`xcaddy` - Custom Go-cqhttp Builder
+`xgo-cqhttp` - Custom Go-cqhttp Builder
 ===============================
 
 This command line tool and associated Go package makes it easy to make custom builds of the [go-cqhttp](https://github.com/Mrs4s/go-cqhttp).
@@ -68,4 +68,4 @@ $ xgo-cqhttp build \
 
 This allows you to hack on go-cqhttp core (and optionally plug in extra modules at the same time!) with relative ease.
 
-&copy; 2022 RomiChan Team
+&copy; 2020 Matthew Holt; Modified by Team RomiChan
