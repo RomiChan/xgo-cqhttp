@@ -2,8 +2,8 @@ buildenv_*/
 _gitignore/
 
 # build artifacts
-cmd/xcaddy/xcaddy
-cmd/xcaddy/xcaddy.exe
+cmd/xgo-cqhttp/xcaddy
+cmd/xgo-cqhttp/xcaddy.exe
 
 # mac
 .DS_Store

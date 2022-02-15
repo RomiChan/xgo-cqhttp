@@ -1,4 +1,4 @@
-package xcaddy
+package xgo_cqhttp
 
 import (
 	"encoding/json"

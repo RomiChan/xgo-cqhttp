@@ -6,8 +6,6 @@ package xcaddycmd
 import (
 	"reflect"
 	"testing"
-
-	"github.com/caddyserver/xcaddy"
 )
 
 func TestParseGoListJson(t *testing.T) {

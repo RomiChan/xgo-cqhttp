@@ -30,11 +30,11 @@ import (
 	"runtime/debug"
 	"strings"
 
-	"github.com/caddyserver/xcaddy"
+	xgocq "github.com/RomiChan/xgo-cqhttp"
 )
 
 var (
-	caddyVersion     = os.Getenv("CADDY_VERSION")
+	gocqhttpVersion  = os.Getenv("GOCQHTTP_VERSION")
 	raceDetector     = os.Getenv("XCADDY_RACE_DETECTOR") == "1"
 	skipBuild        = os.Getenv("XCADDY_SKIP_BUILD") == "1"
 	skipCleanup      = os.Getenv("XCADDY_SKIP_CLEANUP") == "1"
@@ -54,7 +54,7 @@ func Main() {
 	}
 
 	if len(os.Args) > 1 && os.Args[1] == "version" {
-		fmt.Println(xcaddyVersion())
+		fmt.Println(xgocqVersion())
 		return
 	}
 
@@ -66,8 +66,8 @@ func Main() {
 func runBuild(ctx context.Context, args []string) error {
 	// parse the command line args... rather primitively
 	var argCaddyVersion, output string
-	var plugins []xcaddy.Dependency
-	var replacements []xcaddy.Replace
+	var plugins []xgocq.Dependency
+	var replacements []xgocq.Replace
 	for i := 0; i < len(args); i++ {
 		switch args[i] {
 		case "--with":
@@ -80,7 +80,7 @@ func runBuild(ctx context.Context, args []string) error {
 				return err
 			}
 			mod = strings.TrimSuffix(mod, "/") // easy to accidentally leave a trailing slash if pasting from a URL, but is invalid for Go modules
-			plugins = append(plugins, xcaddy.Dependency{
+			plugins = append(plugins, xgocq.Dependency{
 				PackagePath: mod,
 				Version:     ver,
 			})
@@ -93,7 +93,7 @@ func runBuild(ctx context.Context, args []string) error {
 					}
 					log.Printf("[INFO] Resolved relative replacement %s to %s", args[i], repl)
 				}
-				replacements = append(replacements, xcaddy.NewReplace(mod, repl))
+				replacements = append(replacements, xgocq.NewReplace(mod, repl))
 			}
 
 		case "--output":
@@ -113,7 +113,7 @@ func runBuild(ctx context.Context, args []string) error {
 
 	// prefer caddy version from command line argument over env var
 	if argCaddyVersion != "" {
-		caddyVersion = argCaddyVersion
+		gocqhttpVersion = argCaddyVersion
 	}
 
 	// ensure an output file is always specified
@@ -122,17 +122,17 @@ func runBuild(ctx context.Context, args []string) error {
 	}
 
 	// perform the build
-	builder := xcaddy.Builder{
-		Compile: xcaddy.Compile{
+	builder := xgocq.Builder{
+		Compile: xgocq.Compile{
 			Cgo: os.Getenv("CGO_ENABLED") == "1",
 		},
-		CaddyVersion: caddyVersion,
-		Plugins:      plugins,
-		Replacements: replacements,
-		RaceDetector: raceDetector,
-		SkipBuild:    skipBuild,
-		SkipCleanup:  skipCleanup,
-		Debug:        buildDebugOutput,
+		GoCQHTTPVersion: gocqhttpVersion,
+		Plugins:         plugins,
+		Replacements:    replacements,
+		RaceDetector:    raceDetector,
+		SkipBuild:       skipBuild,
+		SkipCleanup:     skipCleanup,
+		Debug:           buildDebugOutput,
 	}
 	err := builder.Build(ctx, output)
 	if err != nil {
@@ -160,9 +160,9 @@ func runBuild(ctx context.Context, args []string) error {
 
 func getCaddyOutputFile() string {
 	if runtime.GOOS == "windows" {
-		return "caddy.exe"
+		return "go-cqhttp.exe"
 	}
-	return "." + string(filepath.Separator) + "caddy"
+	return "." + string(filepath.Separator) + "go-cqhttp"
 }
 
 func runDev(ctx context.Context, args []string) error {
@@ -198,12 +198,12 @@ func runDev(ctx context.Context, args []string) error {
 	importPath := normalizeImportPath(currentModule, cwd, moduleDir)
 
 	// build caddy with this module plugged in
-	builder := xcaddy.Builder{
-		Compile: xcaddy.Compile{
+	builder := xgocq.Builder{
+		Compile: xgocq.Compile{
 			Cgo: os.Getenv("CGO_ENABLED") == "1",
 		},
-		CaddyVersion: caddyVersion,
-		Plugins: []xcaddy.Dependency{
+		GoCQHTTPVersion: gocqhttpVersion,
+		Plugins: []xgocq.Dependency{
 			{PackagePath: importPath},
 		},
 		Replacements: replacements,
@@ -259,7 +259,7 @@ type module struct {
 	Dir     string  // directory holding files for this module, if any
 }
 
-func parseGoListJson(out []byte) (currentModule, moduleDir string, replacements []xcaddy.Replace, err error) {
+func parseGoListJson(out []byte) (currentModule, moduleDir string, replacements []xgocq.Replace, err error) {
 	var unjoinedReplaces []int
 
 	decoder := json.NewDecoder(bytes.NewReader(out))
@@ -277,7 +277,7 @@ func parseGoListJson(out []byte) (currentModule, moduleDir string, replacements 
 			// root directory path of the main module
 			currentModule = mod.Path
 			moduleDir = mod.Dir
-			replacements = append(replacements, xcaddy.NewReplace(currentModule, moduleDir))
+			replacements = append(replacements, xgocq.NewReplace(currentModule, moduleDir))
 			continue
 		}
 
@@ -309,13 +309,13 @@ func parseGoListJson(out []byte) (currentModule, moduleDir string, replacements 
 			}
 		}
 
-		replacements = append(replacements, xcaddy.NewReplace(src, dst))
+		replacements = append(replacements, xgocq.NewReplace(src, dst))
 	}
 	for _, idx := range unjoinedReplaces {
 		unresolved := string(replacements[idx].New)
 		resolved := filepath.Join(moduleDir, unresolved)
 		log.Printf("[INFO] Resolved relative replacement %s to %s", unresolved, resolved)
-		replacements[idx].New = xcaddy.ReplacementPath(resolved)
+		replacements[idx].New = xgocq.ReplacementPath(resolved)
 	}
 	return
 }
@@ -369,8 +369,8 @@ func splitWith(arg string) (module, version, replace string, err error) {
 	return
 }
 
-// xcaddyVersion returns a detailed version string, if available.
-func xcaddyVersion() string {
+// xgocqVersion returns a detailed version string, if available.
+func xgocqVersion() string {
 	mod := goModule()
 	ver := mod.Version
 	if mod.Sum != "" {
@@ -394,12 +394,12 @@ func goModule() *debug.Module {
 	bi, ok := debug.ReadBuildInfo()
 	if ok {
 		mod.Path = bi.Main.Path
-		// The recommended way to build xcaddy involves
+		// The recommended way to build xgocq involves
 		// creating a separate main module, which
 		// TODO: track related Go issue: https://github.com/golang/go/issues/29228
 		// once that issue is fixed, we should just be able to use bi.Main... hopefully.
 		for _, dep := range bi.Deps {
-			if dep.Path == "github.com/caddyserver/xcaddy" {
+			if dep.Path == "github.com/RomiChan/xgo-cqhttp" {
 				return dep
 			}
 		}

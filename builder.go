@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package xcaddy
+package xgo_cqhttp
 
 import (
 	"context"
@@ -35,15 +35,15 @@ import (
 // configuration it represents.
 type Builder struct {
 	Compile
-	CaddyVersion string        `json:"caddy_version,omitempty"`
-	Plugins      []Dependency  `json:"plugins,omitempty"`
-	Replacements []Replace     `json:"replacements,omitempty"`
-	TimeoutGet   time.Duration `json:"timeout_get,omitempty"`
-	TimeoutBuild time.Duration `json:"timeout_build,omitempty"`
-	RaceDetector bool          `json:"race_detector,omitempty"`
-	SkipCleanup  bool          `json:"skip_cleanup,omitempty"`
-	SkipBuild    bool          `json:"skip_build,omitempty"`
-	Debug        bool          `json:"debug,omitempty"`
+	GoCQHTTPVersion string        `json:"gocq_version,omitempty"`
+	Plugins         []Dependency  `json:"plugins,omitempty"`
+	Replacements    []Replace     `json:"replacements,omitempty"`
+	TimeoutGet      time.Duration `json:"timeout_get,omitempty"`
+	TimeoutBuild    time.Duration `json:"timeout_build,omitempty"`
+	RaceDetector    bool          `json:"race_detector,omitempty"`
+	SkipCleanup     bool          `json:"skip_cleanup,omitempty"`
+	SkipBuild       bool          `json:"skip_build,omitempty"`
+	Debug           bool          `json:"debug,omitempty"`
 }
 
 // Build builds Caddy at the configured version with the
@@ -101,7 +101,7 @@ func (b Builder) Build(ctx context.Context, outputFile string) error {
 	log.Println("[INFO] Building Caddy")
 
 	// tidy the module to ensure go.mod and go.sum are consistent with the module prereq
-	tidyCmd := buildEnv.newCommand("go", "mod", "tidy")
+	tidyCmd := buildEnv.newCommand("go", "mod", "tidy", "-compat=1.17")
 	if err := buildEnv.runCommand(ctx, tidyCmd, b.TimeoutGet); err != nil {
 		return err
 	}
@@ -112,7 +112,7 @@ func (b Builder) Build(ctx context.Context, outputFile string) error {
 	)
 	if !b.Debug {
 		cmd.Args = append(cmd.Args,
-			"-ldflags", "-w -s", // trim debug symbols
+			"-ldflags", "-w -s -X github.com/Mrs4s/go-cqhttp/internal/base.Version="+buildEnv.caddyVersion, // trim debug symbols
 			"-trimpath",
 		)
 	}
@@ -269,5 +269,5 @@ const (
 	// used for temporary folder paths.
 	yearMonthDayHourMin = "2006-01-02-1504"
 
-	defaultCaddyModulePath = "github.com/caddyserver/caddy"
+	defaultGOCQPath = "github.com/Mrs4s/go-cqhttp"
 )

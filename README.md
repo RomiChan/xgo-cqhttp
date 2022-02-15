@@ -1,11 +1,7 @@
 `xcaddy` - Custom Caddy Builder
 ===============================
 
-This command line tool and associated Go package makes it easy to make custom builds of the [Caddy Web Server](https://github.com/caddyserver/caddy).
-
-It is used heavily by Caddy plugin developers as well as anyone who wishes to make custom `caddy` binaries (with or without plugins).
-
-Stay updated, be aware of changes, and please submit feedback! Thanks!
+This command line tool and associated Go package makes it easy to make custom builds of the [go-cqhttp](https://github.com/Mrs4s/go-cqhttp).
 
 ## Requirements
 
@@ -13,34 +9,24 @@ Stay updated, be aware of changes, and please submit feedback! Thanks!
 
 ## Install
 
-You can [download binaries](https://github.com/caddyserver/xcaddy/releases) that are already compiled for your platform from the Release tab. 
+You can [download binaries](https://github.com/RomiChan/xgo-cqhttp/releases) that are already compiled for your platform from the Release tab. 
 
-You may also build `xcaddy` from source:
-
-```bash
-$ go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
-```
-
-For Debian, Ubuntu, and Raspbian, an `xcaddy` package is available from our [Cloudsmith repo](https://cloudsmith.io/~caddy/repos/xcaddy/packages/):
+You may also build `xgo-cqhttp` from source:
 
 ```bash
-sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/xcaddy/gpg.key' | sudo tee /etc/apt/trusted.gpg.d/caddy-xcaddy.asc
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/xcaddy/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-xcaddy.list
-sudo apt update
-sudo apt install xcaddy
+$ go install github.com/RomiChan/xgo-cqhttp/cmd/xgo-cqhttp@latest
 ```
 
 ## Command usage
 
-The `xcaddy` command has two primary uses:
+The `xgo-cqhttp` command has two primary uses:
 
-1. Compile custom `caddy` binaries
+1. Compile custom `xgo-cqhttp` binaries
 2. A replacement for `go run` while developing Caddy plugins
 
-The `xcaddy` command will use the latest version of Caddy by default. You can customize this for all invocations by setting the `CADDY_VERSION` environment variable.
+The `xgo-cqhttp` command will use the latest version of Caddy by default. You can customize this for all invocations by setting the `GOCQHTTP_VERSION` environment variable.
 
-As usual with `go` command, the `xcaddy` command will pass the `GOOS`, `GOARCH`, and `GOARM` environment variables through for cross-compilation.
+As usual with `go` command, the `xgo-cqhttp` command will pass the `GOOS`, `GOARCH`, and `GOARM` environment variables through for cross-compilation.
 
 
 ### Custom builds
@@ -48,104 +34,38 @@ As usual with `go` command, the `xcaddy` command will pass the `GOOS`, `GOARCH`,
 Syntax:
 
 ```
-$ xcaddy build [<caddy_version>]
+$ xgo-cqhttp build [<gocq_version>]
     [--output <file>]
     [--with <module[@version][=replacement]>...]
 ```
 
-- `<caddy_version>` is the core Caddy version to build; defaults to `CADDY_VERSION` env variable or latest.
+- `<gocq_version>` is the core Caddy version to build; defaults to `GOCQHTTP_VERSION` env variable or latest.
 - `--output` changes the output file.
 - `--with` can be used multiple times to add plugins by specifying the Go module name and optionally its version, similar to `go get`. Module name is required, but specific version and/or local replacement are optional.
 
 Examples:
 
 ```bash
-$ xcaddy build \
-    --with github.com/caddyserver/ntlm-transport
+$ xgo-cqhttp build \
+    --with github.com/Mrs4s/go-cqhttp/db/mongodb
 
-$ xcaddy build v2.0.1 \
-    --with github.com/caddyserver/ntlm-transport@v0.1.1
+$ xgo-cqhttp build v1.0.0-rc1 \
+    --with github.com/Mrs4s/go-cqhttp/db/mongodb@v1.0.0-rc1
 
-$ xcaddy build \
-    --with github.com/caddyserver/ntlm-transport=../../my-fork
+$ xgo-cqhttp build \
+    --with github.com/Mrs4s/MiraiGo=../../my-fork
 
-$ xcaddy build \
-    --with github.com/caddyserver/ntlm-transport@v0.1.1=../../my-fork
+$ xgo-cqhttp build \
+    --with github.com/Mrs4s/MiraiGo@v0.1.1=../../my-fork
 ```
 
 You can even replace Caddy core using the `--with` flag:
 
 ```
 $ xcaddy build \
-    --with github.com/caddyserver/caddy/v2=../../my-caddy-fork
+    --with github.com/Mrs4s/go-cqhttp=../../my-caddy-fork
 ```
 
-This allows you to hack on Caddy core (and optionally plug in extra modules at the same time!) with relative ease.
-
-
-### For plugin development
-
-If you run `xcaddy` from within the folder of the Caddy plugin you're working on _without the `build` subcommand_, it will build Caddy with your current module and run it, as if you manually plugged it in and invoked `go run`.
-
-The binary will be built and run from the current directory, then cleaned up.
-
-The current working directory must be inside an initialized Go module.
-
-Syntax:
-
-```
-$ xcaddy <args...>
-```
-- `<args...>` are passed through to the `caddy` command.
-
-For example:
-
-```bash
-$ xcaddy list-modules
-$ xcaddy run
-$ xcaddy run --config caddy.json
-```
-
-The race detector can be enabled by setting `XCADDY_RACE_DETECTOR=1`. The DWARF debug info can be enabled by setting `XCADDY_DEBUG=1`.
-
-
-### Getting `xcaddy`'s version
-
-```
-$ xcaddy version
-```
-
-
-## Library usage
-
-```go
-builder := xcaddy.Builder{
-	CaddyVersion: "v2.0.0",
-	Plugins: []xcaddy.Dependency{
-		{
-			ModulePath: "github.com/caddyserver/ntlm-transport",
-			Version:    "v0.1.1",
-		},
-	},
-}
-err := builder.Build(context.Background(), "./caddy")
-```
-
-Versions can be anything compatible with `go get`.
-
-
-
-## Environment variables
-
-Because the subcommands and flags are constrained to benefit rapid plugin prototyping, xcaddy does read some environment variables to take cues for its behavior and/or configuration when there is no room for flags.
-
-- `CADDY_VERSION` sets the version of Caddy to build.
-- `XCADDY_RACE_DETECTOR=1` enables the Go race detector in the build.
-- `XCADDY_DEBUG=1` enables the DWARF debug information in the build.
-- `XCADDY_SETCAP=1` will run `sudo setcap cap_net_bind_service=+ep` on the temporary binary before running it when in dev mode.
-- `XCADDY_SKIP_BUILD=1` causes xcaddy to not compile the program, it is used in conjunction with build tools such as [GoReleaser](https://goreleaser.com). Implies `XCADDY_SKIP_CLEANUP=1`.
-- `XCADDY_SKIP_CLEANUP=1` causes xcaddy to leave build artifacts on disk after exiting.
-
----
+This allows you to hack on go-cqhttp core (and optionally plug in extra modules at the same time!) with relative ease.
 
 &copy; 2020 Matthew Holt

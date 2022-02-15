@@ -15,7 +15,7 @@
 package main
 
 import (
-	xcaddycmd "github.com/caddyserver/xcaddy/cmd"
+	xcaddycmd "github.com/RomiChan/xgo-cqhttp/cmd"
 )
 
 func main() {

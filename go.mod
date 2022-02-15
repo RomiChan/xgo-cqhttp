@@ -1,4 +1,4 @@
-module github.com/caddyserver/xcaddy
+module github.com/RomiChan/xgo-cqhttp
 
 go 1.14
 

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package xcaddy
+package xgo_cqhttp
 
 import (
 	"bytes"
@@ -29,12 +29,7 @@ import (
 )
 
 func (b Builder) newEnvironment(ctx context.Context) (*environment, error) {
-	// assume Caddy v2 if no semantic version is provided
-	caddyModulePath := defaultCaddyModulePath
-	if !strings.HasPrefix(b.CaddyVersion, "v") || !strings.Contains(b.CaddyVersion, ".") {
-		caddyModulePath += "/v2"
-	}
-	caddyModulePath, err := versionedModulePath(caddyModulePath, b.CaddyVersion)
+	caddyModulePath, err := versionedModulePath(defaultGOCQPath, b.GoCQHTTPVersion)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +44,7 @@ func (b Builder) newEnvironment(ctx context.Context) (*environment, error) {
 
 	// create the context for the main module template
 	tplCtx := goModTemplateContext{
-		CaddyModule: caddyModulePath,
+		GocqModule: caddyModulePath,
 	}
 	for _, p := range b.Plugins {
 		tplCtx.Plugins = append(tplCtx.Plugins, p.PackagePath)
@@ -90,7 +85,7 @@ func (b Builder) newEnvironment(ctx context.Context) (*environment, error) {
 	}
 
 	env := &environment{
-		caddyVersion:    b.CaddyVersion,
+		caddyVersion:    b.GoCQHTTPVersion,
 		plugins:         b.Plugins,
 		caddyModulePath: caddyModulePath,
 		tempFolder:      tempFolder,
@@ -244,23 +239,24 @@ func (env environment) execGoGet(ctx context.Context, modulePath, moduleVersion 
 }
 
 type goModTemplateContext struct {
-	CaddyModule string
-	Plugins     []string
+	GocqModule string
+	Plugins    []string
 }
 
 const mainModuleTemplate = `package main
 
 import (
-	caddycmd "{{.CaddyModule}}/cmd"
+	gocq "{{.GocqModule}}/cmd/gocq"
 
-	// plug in Caddy modules here
-	_ "{{.CaddyModule}}/modules/standard"
+	_ "github.com/Mrs4s/go-cqhttp/db/leveldb"    // leveldb
+	_ "github.com/Mrs4s/go-cqhttp/modules/mime"  // mime检查模块
+	_ "github.com/Mrs4s/go-cqhttp/modules/silk"  // silk编码模块
 	{{- range .Plugins}}
 	_ "{{.}}"
 	{{- end}}
 )
 
 func main() {
-	caddycmd.Main()
+	gocq.Main()
 }
 `

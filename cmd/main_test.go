@@ -102,27 +102,27 @@ func TestNormalizeImportPath(t *testing.T) {
 
 	tests := testCaseType{
 		{"linux-path", args{
-			currentModule: "github.com/caddyserver/xcaddy",
+			currentModule: "github.com/RomiChan/xgo-cqhttp",
 			cwd:           "/xcaddy",
 			moduleDir:     "/xcaddy",
-		}, "github.com/caddyserver/xcaddy"},
+		}, "github.com/RomiChan/xgo-cqhttp"},
 		{"linux-subpath", args{
-			currentModule: "github.com/caddyserver/xcaddy",
+			currentModule: "github.com/RomiChan/xgo-cqhttp",
 			cwd:           "/xcaddy/subdir",
 			moduleDir:     "/xcaddy",
-		}, "github.com/caddyserver/xcaddy/subdir"},
+		}, "github.com/RomiChan/xgo-cqhttp/subdir"},
 	}
 	windowsTests := testCaseType{
 		{"windows-path", args{
-			currentModule: "github.com/caddyserver/xcaddy",
+			currentModule: "github.com/RomiChan/xgo-cqhttp",
 			cwd:           "c:\\xcaddy",
 			moduleDir:     "c:\\xcaddy",
-		}, "github.com/caddyserver/xcaddy"},
+		}, "github.com/RomiChan/xgo-cqhttp"},
 		{"windows-subpath", args{
-			currentModule: "github.com/caddyserver/xcaddy",
+			currentModule: "github.com/RomiChan/xgo-cqhttp",
 			cwd:           "c:\\xcaddy\\subdir",
 			moduleDir:     "c:\\xcaddy",
-		}, "github.com/caddyserver/xcaddy/subdir"},
+		}, "github.com/RomiChan/xgo-cqhttp/subdir"},
 	}
 	if runtime.GOOS == "windows" {
 		tests = append(tests, windowsTests...)
