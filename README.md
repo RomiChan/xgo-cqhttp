@@ -1,4 +1,4 @@
-`xcaddy` - Custom Caddy Builder
+`xcaddy` - Custom Go-cqhttp Builder
 ===============================
 
 This command line tool and associated Go package makes it easy to make custom builds of the [go-cqhttp](https://github.com/Mrs4s/go-cqhttp).
@@ -22,9 +22,9 @@ $ go install github.com/RomiChan/xgo-cqhttp/cmd/xgo-cqhttp@latest
 The `xgo-cqhttp` command has two primary uses:
 
 1. Compile custom `xgo-cqhttp` binaries
-2. A replacement for `go run` while developing Caddy plugins
+2. A replacement for `go run` while developing go-cqhttp plugins
 
-The `xgo-cqhttp` command will use the latest version of Caddy by default. You can customize this for all invocations by setting the `GOCQHTTP_VERSION` environment variable.
+The `xgo-cqhttp` command will use the latest version of go-cqhttp by default. You can customize this for all invocations by setting the `GOCQHTTP_VERSION` environment variable.
 
 As usual with `go` command, the `xgo-cqhttp` command will pass the `GOOS`, `GOARCH`, and `GOARM` environment variables through for cross-compilation.
 
@@ -39,7 +39,7 @@ $ xgo-cqhttp build [<gocq_version>]
     [--with <module[@version][=replacement]>...]
 ```
 
-- `<gocq_version>` is the core Caddy version to build; defaults to `GOCQHTTP_VERSION` env variable or latest.
+- `<gocq_version>` is the core go-cqhttp version to build; defaults to `GOCQHTTP_VERSION` env variable or latest.
 - `--output` changes the output file.
 - `--with` can be used multiple times to add plugins by specifying the Go module name and optionally its version, similar to `go get`. Module name is required, but specific version and/or local replacement are optional.
 
@@ -59,13 +59,13 @@ $ xgo-cqhttp build \
     --with github.com/Mrs4s/MiraiGo@v0.1.1=../../my-fork
 ```
 
-You can even replace Caddy core using the `--with` flag:
+You can even replace go-cqhttp core using the `--with` flag:
 
 ```
-$ xcaddy build \
-    --with github.com/Mrs4s/go-cqhttp=../../my-caddy-fork
+$ xgo-cqhttp build \
+    --with github.com/Mrs4s/go-cqhttp=../../my-go-cqhttp-fork
 ```
 
 This allows you to hack on go-cqhttp core (and optionally plug in extra modules at the same time!) with relative ease.
 
-&copy; 2020 Matthew Holt
+&copy; 2022 RomiChan Team
