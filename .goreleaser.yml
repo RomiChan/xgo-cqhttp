@@ -72,8 +72,8 @@ checksum:
 
 release:
   github:
-    owner: caddyserver
-    name: xcaddy
+    owner: RomiChan
+    name: xgo-cqhttp
   draft: false
   prerelease: auto
 
