@@ -24,15 +24,15 @@ jobs:
         # SUCCESS: the typical value for $? per OS (Windows/pwsh returns 'True')
         include:
         - os: ubuntu-latest
-          XCADDY_BIN_PATH: ./cmd/xcaddy/xcaddy
+          XCADDY_BIN_PATH: ./cmd/xgo-cqhttp/xgo-cqhttp
           SUCCESS: 0
 
         - os: macos-latest
-          XCADDY_BIN_PATH: ./cmd/xcaddy/xcaddy
+          XCADDY_BIN_PATH: ./cmd/xgo-cqhttp/xgo-cqhttp
           SUCCESS: 0
 
         - os: windows-latest
-          XCADDY_BIN_PATH: ./cmd/xcaddy/xcaddy.exe
+          XCADDY_BIN_PATH: ./cmd/xgo-cqhttp/xgo-cqhttp.exe
           SUCCESS: 'True'
 
     runs-on: ${{ matrix.os }}
@@ -72,7 +72,7 @@ jobs:
         go get -v -t -d ./...
 
     - name: Build xcaddy
-      working-directory: ./cmd/xcaddy
+      working-directory: ./cmd/xgo-cqhttp
       env:
         CGO_ENABLED: 0
       run: |
@@ -85,7 +85,7 @@ jobs:
     - name: Publish Build Artifact
       uses: actions/upload-artifact@v1
       with:
-        name: xcaddy_${{ runner.os }}_go${{ matrix.go }}_${{ steps.vars.outputs.short_sha }}
+        name: xgo-cqhttp_${{ runner.os }}_go${{ matrix.go }}_${{ steps.vars.outputs.short_sha }}
         path: ${{ matrix.XCADDY_BIN_PATH }}
 
     - name: Run tests
