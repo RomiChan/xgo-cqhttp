@@ -6,6 +6,8 @@ package xcaddycmd
 import (
 	"reflect"
 	"testing"
+
+	xcaddy "github.com/RomiChan/xgo-cqhttp"
 )
 
 func TestParseGoListJson(t *testing.T) {
